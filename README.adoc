@@ -1,0 +1,6 @@
+= Java Coding Problems
+
+Solutions for exercises in link:https://www.oreilly.com/library/view/java-coding-problems/9781789801415/[Java Coding Problems] book.
+
+* link:lib/src/main/java/com/github/nikolay_martynov/java_coding_problems/[Source]
+* link:lib/src/test/groovy/com/github/nikolay_martynov/java_coding_problems/[Tests]
