@@ -22,6 +22,7 @@ repositories {
 
 dependencies {
     testImplementation platform('org.apache.groovy:groovy-bom:4.0.2')
+    testImplementation 'org.apache.commons:commons-collections4:4.4'
 }
 
 testing {
