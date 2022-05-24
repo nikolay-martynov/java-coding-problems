@@ -111,8 +111,7 @@ public class Chapter1 {
         int leftWordStart = 0;
         int rightWordEnd = source.length() - 1;
         while (leftWordStart < source.length()) {
-            for (; leftWordStart < source.length() && Character.isWhitespace(source.charAt(leftWordStart));
-                 leftWordStart++) {
+            for (; leftWordStart < source.length() && Character.isWhitespace(source.charAt(leftWordStart)); leftWordStart++) {
                 result.append(source.charAt(leftWordStart));
             }
             if (leftWordStart == source.length()) {
@@ -128,8 +127,7 @@ public class Chapter1 {
             }
             rightWordEnd = rightWordStart;
             int leftWordEnd = leftWordStart;
-            for (; leftWordEnd < source.length() && !Character.isWhitespace(source.charAt(leftWordEnd));
-                 leftWordEnd++) {
+            for (; leftWordEnd < source.length() && !Character.isWhitespace(source.charAt(leftWordEnd)); leftWordEnd++) {
             }
             leftWordStart = leftWordEnd;
         }
@@ -168,11 +166,7 @@ public class Chapter1 {
 
     private static final Set<Character> VOWELS = Set.of('a', 'e', 'i', 'o', 'u');
 
-    private static final Set<Character> CONSONANTS = Collections.unmodifiableSet(
-            IntStream.rangeClosed('a', 'z')
-                    .mapToObj(c -> (char) c)
-                    .filter(c -> !VOWELS.contains(c))
-                    .collect(Collectors.toSet()));
+    private static final Set<Character> CONSONANTS = Collections.unmodifiableSet(IntStream.rangeClosed('a', 'z').mapToObj(c -> (char) c).filter(c -> !VOWELS.contains(c)).collect(Collectors.toSet()));
 
     /**
      * Counts vowels and consonants in a given string.
@@ -219,6 +213,155 @@ public class Chapter1 {
             }
         }
         return result.toString();
+    }
+
+    /**
+     * Generates all permutations of a given string.
+     *
+     * @param source String from which to generate permutations.
+     * @return Iterator that returns all (not only unique) permutations of a given string or returns nothing
+     * if the given string is null or empty.
+     * <p>
+     * Task 10.
+     */
+    public static Iterator<String> generatePermutations(String source) {
+        if (source == null || source.isEmpty()) {
+            return new Iterator<String>() {
+                @Override
+                public boolean hasNext() {
+                    return false;
+                }
+
+                @Override
+                public String next() {
+                    throw new NoSuchElementException("No permutations for null or empty string");
+                }
+            };
+        }
+        return new Iterator<String>() {
+            /**
+             * We can take all permutations of 0123...(source.length()-1)
+             * and treat number in each position as an index in the source string.
+             * Then we can re-compose each permutation of the original string from those indexes.
+             *
+             * Each indexes[i] contains a character position in the source string
+             * that should be used in the i-th position of the current permutation.
+             * Means, permutation.charAt(i)==source.charAt(indexes[i]).
+             *
+             * We'll generate permutations of indexes in lexicographical order.
+             * The first permutation would be 0123...(source.length()-1) - this is just a copy of the source string.
+             * The last permutation would be (source.length()-1)...3210.
+             */
+            final int[] indexes;
+
+            /**
+             * Indicates if we have already returned the last permutation or not yet.
+             *
+             * Reminder: last permutation corresponds to (source.length()-1)...3210 indexes since we use
+             * lexicographical order.
+             */
+            boolean hasMore;
+
+            {
+                // Reminder: first permutation is 0123...(source.length()-1) - the same as source string.
+                indexes = new int[source.length()];
+                for (int i = 0; i < source.length(); i++) {
+                    indexes[i] = i;
+                }
+                // We've already covered the case with an empty string, so we always have at least one permutation
+                // in the beginning - the original string itself.
+                // Even when it is a single character.
+                hasMore = true;
+            }
+
+            @Override
+            public boolean hasNext() {
+                return hasMore;
+            }
+
+            @Override
+            public String next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException("No more permutations");
+                }
+                // We reconstruct and return string from permutation of indices
+                // that has been generated either during initialization or previous iteration.
+                StringBuilder result = new StringBuilder(source.length());
+                for (int i = 0; i < source.length(); i++) {
+                    result.append(source.charAt(indexes[i]));
+                }
+                // Now we can advance to the next permutation.
+                // We're moving from 0123456789 to 9876543210 in the lexicographical order.
+                // This would look like the following:
+                // 0123456789
+                // 0123456798
+                // 0123456879
+                // 0123456897
+                // 0123456978
+                // 0123456987
+                // 0123457689
+                // 0123457698
+                // 0123457869
+                // 0123457896
+                // 0123457968
+                // 0123457986
+                // ...
+                // 9876543210
+                // When we have some decreasing sequence at the end,
+                // to go to the next permutation in the lexicographical order,
+                // we need to overflow to the next place to the left
+                // and start from the smallest value to the right of this position.
+                // For example:
+                // 0123456987
+                // 0123457689
+                // The decreasing sequence was 987, and before it was 6.
+                // We can now swap 6 with 7 to get 7986.
+                // Notice that what we have after 7 is still a decreasing sequence.
+                // This is the highest value: we cannot increase 986 without another overflow.
+                // To make the smallest value in those places,
+                // we can just reverse this right part after 7 so 986 becomes 689.
+                // That's how we've advanced from
+                // 0123456987 to
+                // 0123457689.
+                // First, we find the beginning of the decreasing sequence in the end.
+                int k = source.length() - 2;
+                while (k >= 0 && indexes[k] > indexes[k + 1]) {
+                    k--;
+                }
+                if (k < 0) {
+                    // It looks like we have 9876543210 - this is the last permutation.
+                    hasMore = false;
+                    return result.toString();
+                }
+                // Now k is the position before decreasing sequence.
+                // This means k is the position we need to overflow to by swapping with
+                // a higher value than we currently have in k that is to the right of k
+                // and which is closest to k.
+                // Since numbers there are a decreasing sequence,
+                // we search for the first one that isn't greater than k.
+                int t = k + 1;
+                while (t < source.length() - 1 && indexes[k] < indexes[t + 1]) {
+                    t++;
+                }
+                // Now we can swap k-th and t-th elements.
+                {
+                    int tmp = indexes[t];
+                    indexes[t] = indexes[k];
+                    indexes[k] = tmp;
+                }
+                // And reverse the rest of numbers to the right of k to reset it from the highest to the lowest value.
+                {
+                    int i;
+                    int j;
+                    for (i = k + 1, j = source.length() - 1; i < j; i++, j--) {
+                        int tmp = indexes[j];
+                        indexes[j] = indexes[i];
+                        indexes[i] = tmp;
+                    }
+                }
+                return result.toString();
+            }
+        };
     }
 
 }

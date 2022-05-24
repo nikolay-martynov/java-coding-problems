@@ -98,4 +98,41 @@ class Chapter1Test extends Specification {
         '   '           | ''
         ' a  b   c    ' | 'abc'
     }
+
+    def "GeneratePermutations"() {
+        expect:
+        Chapter1.generatePermutations(s).collect() ==~ p
+        where:
+        s      | p
+        null   | []
+        ''     | []
+        'a'    | ['a']
+        'ab'   | ['ab', 'ba']
+        'abc'  | ['abc', 'acb', 'bac', 'cba', 'bca', 'cab']
+        'abcd' | ['abcd',
+                  'abdc',
+                  'acbd',
+                  'acdb',
+                  'adbc',
+                  'adcb',
+                  'bacd',
+                  'badc',
+                  'bcad',
+                  'bcda',
+                  'bdac',
+                  'bdca',
+                  'cabd',
+                  'cadb',
+                  'cbad',
+                  'cbda',
+                  'cdab',
+                  'cdba',
+                  'dabc',
+                  'dacb',
+                  'dbac',
+                  'dbca',
+                  'dcab',
+                  'dcba',
+        ]
+    }
 }
