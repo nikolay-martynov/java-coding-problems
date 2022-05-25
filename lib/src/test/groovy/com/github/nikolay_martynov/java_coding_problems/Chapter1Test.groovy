@@ -83,8 +83,8 @@ class Chapter1Test extends Specification {
         null         | [0, 0]
         ''           | [0, 0]
         'abc'        | [1, 2]
-        'aaa'        | [3, 0]
-        'modern car' | [3, 6]
+        'aAa'        | [3, 0]
+        'Modern car' | [3, 6]
     }
 
     def "DeleteWhitespace"() {

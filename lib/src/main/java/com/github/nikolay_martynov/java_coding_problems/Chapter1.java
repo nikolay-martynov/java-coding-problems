@@ -182,7 +182,7 @@ public class Chapter1 {
         int vowels = 0;
         int consonants = 0;
         for (int i = 0; source != null && i < source.length(); i++) {
-            char c = source.charAt(i);
+            char c = Character.toLowerCase(source.charAt(i));
             if (VOWELS.contains(c)) {
                 vowels++;
             } else if (CONSONANTS.contains(c)) {
