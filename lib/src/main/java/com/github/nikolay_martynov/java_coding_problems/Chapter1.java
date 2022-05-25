@@ -364,4 +364,123 @@ public class Chapter1 {
         };
     }
 
+    /**
+     * Finds most occurring character in a given string.
+     *
+     * @param source String where to search for most occurring characters.
+     * @return Most occurring character or an empty value if given string is null or empty.
+     * <p>
+     * Task 14.
+     */
+    static public Optional<Character> findMostOccurringCharacter(String source) {
+        if (source == null || source.isEmpty()) {
+            return Optional.empty();
+        }
+        Map<Character, Integer> occurrences = new HashMap<>();
+        for (int i = 0; i < source.length(); i++) {
+            occurrences.compute(source.charAt(i), (k, v) -> v == null ? 1 : ++v);
+        }
+        Optional<Character> mostOccurringCharacter = Optional.empty();
+        int maxOccurrences = 0;
+        for (Map.Entry<Character, Integer> characterInfo : occurrences.entrySet()) {
+            if (characterInfo.getValue() > maxOccurrences) {
+                maxOccurrences = characterInfo.getValue();
+                mostOccurringCharacter = Optional.of(characterInfo.getKey());
+            }
+        }
+        return mostOccurringCharacter;
+    }
+
+    /**
+     * Counts substring in a given string.
+     *
+     * @param source    String where to search for a substring.
+     * @param substring Substring to count.
+     * @return Number of all occurrences of substring in a string or 0 if source or substring are null or empty.
+     * All occurrences' means that all overlapping substrings will be counted separately.
+     * For example,
+     * countSubstring('aaaa', 'aa') == 3
+     * <p>
+     * Task 17 part 2.
+     */
+    static public int countSubstring(String source, String substring) {
+        if (source == null || source.isEmpty() || substring == null || substring.isEmpty()) {
+            return 0;
+        }
+        int count = 0;
+        int start = 0;
+        while ((start = source.indexOf(substring, start)) >= 0) {
+            count++;
+            start++;
+        }
+        return count;
+    }
+
+    /**
+     * Checks if a given string is a repetition of some other string.
+     *
+     * @param source String to check for repetition.
+     * @return false if a given string is null or shorter than two characters and is not a repetition of some substring.
+     * <ul>
+     *     <li>null -> false</li>
+     *     <li>"" -> false</li>
+     *     <li>"a" -> false</li>
+     *     <li>"aa" -> true</li>
+     *     <li>"ab" -> false</li>
+     *     <li>"aba" -> false</li>
+     *     <li>"abab" -> true</li>
+     * </ul>
+     *
+     * Task 20 part 2.
+     */
+    static public boolean isRepeatingSubstrings(String source) {
+        if (source == null || source.isEmpty()) {
+            return false;
+        }
+        List<Integer> possibleSubstringsLengths = new LinkedList<>();
+        for (int substringLength = 1; substringLength <= source.length(); substringLength++) {
+            if (possibleSubstringsLengths.isEmpty() && substringLength > source.length() / 2) {
+                break;
+            }
+            {
+                ListIterator<Integer> possibleSubstringsIterator = possibleSubstringsLengths.listIterator();
+                while (possibleSubstringsIterator.hasNext()) {
+                    int possibleSubstringLength = possibleSubstringsIterator.next();
+                    boolean substringStillRepeats =
+                            source.charAt(substringLength - 1)
+                                    == source.charAt((substringLength - 1) % possibleSubstringLength);
+                    if (!substringStillRepeats) {
+                        possibleSubstringsIterator.remove();
+                    }
+                }
+            }
+            boolean lengthIsMatching = source.length() % substringLength == 0;
+            if (lengthIsMatching && substringLength < source.length()) {
+                boolean prefixIsRepetitionOfOtherSubstring = false;
+                {
+                    ListIterator<Integer> candidatesIterator = possibleSubstringsLengths.listIterator();
+                    while (candidatesIterator.hasNext() && !prefixIsRepetitionOfOtherSubstring) {
+                        int otherCandidateLength = candidatesIterator.next();
+                        if (substringLength % otherCandidateLength != 0) {
+                            continue;
+                        }
+                        prefixIsRepetitionOfOtherSubstring = true;
+                        int indexInOther = 0;
+                        for (int indexInCurrent = 0; indexInCurrent < substringLength; indexInCurrent++) {
+                            if (source.charAt(indexInCurrent) != source.charAt(indexInOther)) {
+                                prefixIsRepetitionOfOtherSubstring = false;
+                                break;
+                            }
+                            indexInOther = (indexInOther + 1) % otherCandidateLength;
+                        }
+                    }
+                }
+                if (!prefixIsRepetitionOfOtherSubstring) {
+                    possibleSubstringsLengths.add(substringLength);
+                }
+            }
+        }
+        return !possibleSubstringsLengths.isEmpty();
+    }
+
 }

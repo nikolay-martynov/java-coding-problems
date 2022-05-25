@@ -135,4 +135,44 @@ class Chapter1Test extends Specification {
                   'dcba',
         ]
     }
+
+    def "FindMostOccurringCharacter"() {
+        expect:
+        Chapter1.findMostOccurringCharacter(s) == c
+        where:
+        s         | c
+        null      | Optional.empty()
+        ''        | Optional.empty()
+        'a'       | Optional.of('a' as char)
+        'abbccba' | Optional.of('b' as char)
+    }
+
+    def "CountSubstring"() {
+        expect:
+        Chapter1.countSubstring(source, substring) == count
+        where:
+        source | substring | count
+        null   | 'a'       | 0
+        'a'    | null      | 0
+        ''     | 'a'       | 0
+        'a'    | ''        | 0
+        'a'    | 'b'       | 0
+        'ab'   | 'a'       | 1
+        'aaaa' | 'aa'      | 3
+    }
+
+    def "IsRepeatingSubstrings"() {
+        expect:
+        Chapter1.isRepeatingSubstrings(s) == r
+        where:
+        s                    | r
+        null                 | false
+        ''                   | false
+        'a'                  | false
+        'aa'                 | true
+        'aba'                | false
+        'abab'               | true
+        'aaaaaaab'           | false
+        '111112345111112345' | true
+    }
 }
