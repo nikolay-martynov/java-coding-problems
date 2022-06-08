@@ -2,5 +2,6 @@
 
 Solutions for exercises in link:https://www.oreilly.com/library/view/java-coding-problems/9781789801415/[Java Coding Problems] book.
 
+* link:https://github.com/nikolay-martynov/profile/blob/main/blog/2022-06-07-Java-coding-problems.adoc[Book review]
 * link:lib/src/main/java/com/github/nikolay_martynov/java_coding_problems/[Source]
 * link:lib/src/test/groovy/com/github/nikolay_martynov/java_coding_problems/[Tests]
